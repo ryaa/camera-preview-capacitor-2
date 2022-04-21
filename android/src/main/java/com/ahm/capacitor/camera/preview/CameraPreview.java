@@ -301,7 +301,11 @@ public class CameraPreview extends Plugin implements CameraActivity.CameraPrevie
                     fragmentTransaction.add(containerView.getId(), fragment);
                     fragmentTransaction.commit();
 
-                    call.success();
+                    // NOTE: we don't return invoke call.success here because it must be invoked in onCameraStarted
+                    // otherwise the plugin start method might return before the camera is actually set in CameraActivity
+                    // onResume method (see this line mCamera = Camera.open(defaultCameraId);) and the next subsequent plugin
+                    // method invocations (for example, getSupportedFlashModes) might fails with "Camera is not running" error
+                    // Please also see https://developer.android.com/reference/android/hardware/Camera.html#open%28int%29
                 } else {
                     call.reject("camera already started");
                 }
